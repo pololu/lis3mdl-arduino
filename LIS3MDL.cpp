@@ -98,31 +98,30 @@ bool LIS3MDL::init(deviceType device, sa1State sa1)
 }
 
 /*
-Enables the LIS3MDL's Magnetometer. Also:
-- Enables temp sensor and sets mag to ultra-high-performance mode for all axes
-- Selects 80 Hz ODR (output data rate).
-- Sets mag full scale (gain) to ±12 gauss
-- Select continuous conversion mode
+Enables the LIS3MDL's magnetometer. Also:
+- Selects ultra-high-performance mode for all axes
+- Sets ODR (output data rate) to default power-on value of 10 Hz
+- Sets magnetometer full scale (gain) to default power-on value of +/- 4 gauss
+- Enables continuous conversion mode
 Note that this function will also reset other settings controlled by
 the registers it writes to.
 */
 void LIS3MDL::enableDefault(void)
 {
-  // 0xFC = 0b11111100
-  // Enables temp sensor and sets mag to ultra-high-performance mode for X and Y
-  // Selects 80 Hz ODR (output data rate)
-  writeReg(CTRL_REG1, 0xFC);
-  
-  // 0x40 = 0b01000000
-  // Sets mag full scale (gain) to ±12 gauss
-  writeReg(CTRL_REG2, 0x40);
+  // 0x70 = 0b01110000
+  // OM = 11 (ultra-high-performance mode for X and Y); DO = 100 (10 Hz ODR)
+  writeReg(CTRL_REG1, 0x70);
   
   // 0x00 = 0b00000000
-  // Select continuous conversion mode
+  // FS = 00 (+/- 4 gauss full scale)
+  writeReg(CTRL_REG2, 0x00);
+  
+  // 0x00 = 0b00000000
+  // MD = 00 (continuous-conversion mode)
   writeReg(CTRL_REG3, 0x00);
   
   // 0x0C = 0b00001100
-  // Sets mag to ultra-high-performance mode for Z
+  // OMZ = 11 (ultra-high-performance mode for Z)
   writeReg(CTRL_REG4, 0x0C);
 }
 
@@ -154,6 +153,7 @@ byte LIS3MDL::readReg(byte reg)
 void LIS3MDL::read()
 {
   Wire.beginTransmission(address);
+  // assert MSB to enable subaddress updating
   Wire.write(OUT_X_L | 0x80);
   Wire.endTransmission();
   Wire.requestFrom(address, (byte)6);
@@ -179,27 +179,6 @@ void LIS3MDL::read()
   m.x = (int16_t)(xhm << 8 | xlm);
   m.y = (int16_t)(yhm << 8 | ylm);
   m.z = (int16_t)(zhm << 8 | zlm);
-}
-
-/*
-Returns the angular difference in the horizontal plane between a
-default vector and north, in degrees.
-
-The default vector here is chosen to point along the surface of the
-PCB, in the direction of the top of the text on the silkscreen.
-This is the +X axis on the Pololu LSM303D carrier and the -Y axis on
-the Pololu LSM303DLHC, LSM303DLM, and LSM303DLH carriers.
-*/
-float LIS3MDL::heading(void)
-{
-  if (_device == device_MDL)
-  {
-    return heading((vector<int>){1, 0, 0});
-  }
-  else
-  {
-    return heading((vector<int>){0, -1, 0});
-  }
 }
 
 void LIS3MDL::vector_normalize(vector<float> *a)
