@@ -6,26 +6,17 @@
 
 // The Arduino two-wire interface uses a 7-bit number for the address,
 // and sets the last bit correctly based on reads and writes
-#define SA1_HIGH_ADDRESS      0b0011110 
-#define SA1_LOW_ADDRESS       0b0011100 
+#define LIS3MDL_SA1_HIGH_ADDRESS  0b0011110
+#define LIS3MDL_SA1_LOW_ADDRESS   0b0011100
 
 #define TEST_REG_ERROR -1
 
-#define WHO_ID     0x3D
+#define LIS3MDL_WHO_ID  0x3D
 
 // Constructors ////////////////////////////////////////////////////////////////
 
 LIS3MDL::LIS3MDL(void)
 {
-    /*
-  These values lead to an assumed magnetometer bias of 0.
-  Use the Calibrate example program to determine appropriate values
-  for your particular unit. The Heading example demonstrates how to
-  adjust these values in your own sketch.
-  */
-  m_min = (LIS3MDL::vector<int16_t>){-32767, -32767, -32767};
-  m_max = (LIS3MDL::vector<int16_t>){+32767, +32767, +32767};
-  
   _device = device_auto;
 
   io_timeout = 0;  // 0 = no timeout
@@ -42,58 +33,54 @@ bool LIS3MDL::timeoutOccurred()
   return tmp;
 }
 
-void LIS3MDL::setTimeout(unsigned int timeout)
+void LIS3MDL::setTimeout(uint16_t timeout)
 {
   io_timeout = timeout;
 }
 
-unsigned int LIS3MDL::getTimeout()
+uint16_t LIS3MDL::getTimeout()
 {
   return io_timeout;
 }
 
 bool LIS3MDL::init(deviceType device, sa1State sa1)
 {
-  int id;
-  
   // perform auto-detection unless device type and SA1 state were both specified
   if (device == device_auto || sa1 == sa1_auto)
   {
-    // check for L3GD20H, D20 if device is unidentified or was specified to be one of these types
-    if (device == device_auto)
+    // check for LIS3MDL if device is unidentified or was specified to be this type
+    if (device == device_auto || device == device_LIS3MDL)
     {
       // check SA1 high address unless SA1 was specified to be low
-      if (sa1 != sa1_low && (id = testReg(SA1_HIGH_ADDRESS, WHO_AM_I)) != TEST_REG_ERROR)
-      {    
+      if (sa1 != sa1_low && testReg(LIS3MDL_SA1_HIGH_ADDRESS, WHO_AM_I) == LIS3MDL_WHO_ID)
+      {
         sa1 = sa1_high;
-        if (device == device_auto)
-        {
-          device = device_LIS3MDL;
-        }
+        if (device == device_auto) { device = device_LIS3MDL; }
       }
       // check SA1 low address unless SA1 was specified to be high
-      else if (sa1 != sa1_high && (id = testReg(SA1_LOW_ADDRESS, WHO_AM_I)) != TEST_REG_ERROR)
-      {   
+      else if (sa1 != sa1_high && testReg(LIS3MDL_SA1_LOW_ADDRESS, WHO_AM_I) == LIS3MDL_WHO_ID)
+      {
         sa1 = sa1_low;
-        if (device == device_auto)
-        {
-          device = device_LIS3MDL;
-        }
+        if (device == device_auto) { device = device_LIS3MDL; }
       }
     }
-    
+
     // make sure device and SA1 were successfully detected; otherwise, indicate failure
     if (device == device_auto || sa1 == sa1_auto)
     {
       return false;
     }
   }
-  
+
   _device = device;
 
-  // set device address
-  address = (sa1 == sa1_high) ? SA1_HIGH_ADDRESS : SA1_LOW_ADDRESS;
-  
+  switch (device)
+  {
+    case device_LIS3MDL:
+      address = (sa1 == sa1_high) ? LIS3MDL_SA1_HIGH_ADDRESS : LIS3MDL_SA1_LOW_ADDRESS;
+      break;
+  }
+
   return true;
 }
 
@@ -108,25 +95,28 @@ the registers it writes to.
 */
 void LIS3MDL::enableDefault(void)
 {
-  // 0x70 = 0b01110000
-  // OM = 11 (ultra-high-performance mode for X and Y); DO = 100 (10 Hz ODR)
-  writeReg(CTRL_REG1, 0x70);
-  
-  // 0x00 = 0b00000000
-  // FS = 00 (+/- 4 gauss full scale)
-  writeReg(CTRL_REG2, 0x00);
-  
-  // 0x00 = 0b00000000
-  // MD = 00 (continuous-conversion mode)
-  writeReg(CTRL_REG3, 0x00);
-  
-  // 0x0C = 0b00001100
-  // OMZ = 11 (ultra-high-performance mode for Z)
-  writeReg(CTRL_REG4, 0x0C);
+  if (_device == device_LIS3MDL)
+  {
+    // 0x70 = 0b01110000
+    // OM = 11 (ultra-high-performance mode for X and Y); DO = 100 (10 Hz ODR)
+    writeReg(CTRL_REG1, 0x70);
+
+    // 0x00 = 0b00000000
+    // FS = 00 (+/- 4 gauss full scale)
+    writeReg(CTRL_REG2, 0x00);
+
+    // 0x00 = 0b00000000
+    // MD = 00 (continuous-conversion mode)
+    writeReg(CTRL_REG3, 0x00);
+
+    // 0x0C = 0b00001100
+    // OMZ = 11 (ultra-high-performance mode for Z)
+    writeReg(CTRL_REG4, 0x0C);
+  }
 }
 
 // Writes a mag register
-void LIS3MDL::writeReg(byte reg, byte value)
+void LIS3MDL::writeReg(uint8_t reg, uint8_t value)
 {
   Wire.beginTransmission(address);
   Wire.write(reg);
@@ -135,14 +125,14 @@ void LIS3MDL::writeReg(byte reg, byte value)
 }
 
 // Reads a mag register
-byte LIS3MDL::readReg(byte reg)
+uint8_t LIS3MDL::readReg(uint8_t reg)
 {
-  byte value;
+  uint8_t value;
 
   Wire.beginTransmission(address);
   Wire.write(reg);
   last_status = Wire.endTransmission();
-  Wire.requestFrom(address, (byte)1);
+  Wire.requestFrom(address, (uint8_t)1);
   value = Wire.read();
   Wire.endTransmission();
 
@@ -156,12 +146,12 @@ void LIS3MDL::read()
   // assert MSB to enable subaddress updating
   Wire.write(OUT_X_L | 0x80);
   Wire.endTransmission();
-  Wire.requestFrom(address, (byte)6);
-  
-  unsigned int millis_start = millis();
+  Wire.requestFrom(address, (uint8_t)6);
+
+  uint16_t millis_start = millis();
   while (Wire.available() < 6)
   {
-    if (io_timeout > 0 && ((unsigned int)millis() - millis_start) > io_timeout)
+    if (io_timeout > 0 && ((uint16_t)millis() - millis_start) > io_timeout)
     {
       did_timeout = true;
       return;
@@ -191,16 +181,16 @@ void LIS3MDL::vector_normalize(vector<float> *a)
 
 // Private Methods //////////////////////////////////////////////////////////////
 
-int LIS3MDL::testReg(byte address, regAddr reg)
+int16_t LIS3MDL::testReg(uint8_t address, regAddr reg)
 {
   Wire.beginTransmission(address);
-  Wire.write((byte)reg);
+  Wire.write((uint8_t)reg);
   if (Wire.endTransmission() != 0)
   {
     return TEST_REG_ERROR;
   }
 
-  Wire.requestFrom(address, (byte)1);
+  Wire.requestFrom(address, (uint8_t)1);
   if (Wire.available())
   {
     return Wire.read();
