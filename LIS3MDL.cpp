@@ -68,7 +68,7 @@ bool LIS3MDL::init(deviceType device, sa1State sa1)
         sa1 = sa1_high;
         if (device == device_auto)
         {
-          device = device_MDL;
+          device = device_LIS3MDL;
         }
       }
       // check SA1 low address unless SA1 was specified to be high
@@ -77,7 +77,7 @@ bool LIS3MDL::init(deviceType device, sa1State sa1)
         sa1 = sa1_low;
         if (device == device_auto)
         {
-          device = device_MDL;
+          device = device_LIS3MDL;
         }
       }
     }
