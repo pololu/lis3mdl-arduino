@@ -1,7 +1,7 @@
 # LIS3MDL library for Arduino
 
 Version: 1.0.0<br>
-Release date: 2016 January 18<br>
+Release date: 2016 January 19<br>
 [www.pololu.com](https://www.pololu.com/)
 
 ## Summary
@@ -76,7 +76,7 @@ Several example sketches are available that show how to use the library. You can
 * `bool init(deviceType device, sa0State sa0)`<br>
   Initializes the library with the device being used (`device_LIS3MDL` or `device_auto`) and the state of the SA1 pin (`sa1_low`, `sa1_high`, or `sa1_auto`), which determines the second-least significant bit of the I&sup2;C slave address. Constants for these arguments are defined in LIS3MDL.h. Both of these arguments are optional; if they are not specified, the library will try to automatically detect the device address. A boolean is returned indicating whether the type of device was successfully determined (if necessary).
 
-  *Note:* Automatic detection of the device type currently does not work with the Arduino Due because of issues with its Wire library. To work around this, specify the device and SA1 state manually (e.g. @init(LIS3MDL::device_LIS3MDL, LIS3MDL::sa1_high)@).
+  *Note:* Automatic detection of the device type currently does not work with the Arduino Due because of issues with its Wire library. To work around this, specify the device and SA1 state manually (e.g. `init(LIS3MDL::device_LIS3MDL, LIS3MDL::sa1_high)`).
 
 * `void getDeviceType(void)`<br>
   Returns the device type specified to or detected by `init()`.
@@ -84,12 +84,12 @@ Several example sketches are available that show how to use the library. You can
 * `void enableDefault(void)`<br>
   Turns on the magnetometer and enables a consistent set of default settings.
 
-  This function will reset the magnetometer to &plusmn;4 gauss full scale. See the comments in LSM6.cpp for a full explanation of the settings.
+  This function will reset the magnetometer to &plusmn;4&nbsp;gauss full scale. See the comments in LIS3MDL.cpp for a full explanation of the settings.
 
 * `void writeReg(uint8_t reg, uint8_t value)`<br>
   Writes a sensor register with the given value.
 
-  Register address constants are defined by the regAddr enumeration type in LSM6.h.<br>
+  Register address constants are defined by the regAddr enumeration type in LIS3MDL.h.<br>
   Example use: `mag.writeReg(LIS3MDL::CTRL_REG1, 0x70);`
 
 * `uint8_t readReg(uint8_t reg)`<br>
@@ -109,4 +109,4 @@ Several example sketches are available that show how to use the library. You can
 
 ## Version history
 
-* 1.0.0 (2015 Sep 24): Original release.
+* 1.0.0 (2016 Jan 19): Original release.
