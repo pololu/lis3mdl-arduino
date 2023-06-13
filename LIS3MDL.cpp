@@ -132,9 +132,9 @@ uint8_t LIS3MDL::readReg(uint8_t reg)
   Wire.beginTransmission(address);
   Wire.write(reg);
   last_status = Wire.endTransmission();
+
   Wire.requestFrom(address, (uint8_t)1);
   value = Wire.read();
-  Wire.endTransmission();
 
   return value;
 }
@@ -146,18 +146,8 @@ void LIS3MDL::read()
   // assert MSB to enable subaddress updating
   Wire.write(OUT_X_L | 0x80);
   Wire.endTransmission();
+
   Wire.requestFrom(address, (uint8_t)6);
-
-  uint16_t millis_start = millis();
-  while (Wire.available() < 6)
-  {
-    if (io_timeout > 0 && ((uint16_t)millis() - millis_start) > io_timeout)
-    {
-      did_timeout = true;
-      return;
-    }
-  }
-
   uint8_t xlm = Wire.read();
   uint8_t xhm = Wire.read();
   uint8_t ylm = Wire.read();
