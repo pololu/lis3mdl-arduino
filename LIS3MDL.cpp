@@ -18,30 +18,9 @@
 LIS3MDL::LIS3MDL(void)
 {
   _device = device_auto;
-
-  io_timeout = 0;  // 0 = no timeout
-  did_timeout = false;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-
-// Did a timeout occur in read() since the last call to timeoutOccurred()?
-bool LIS3MDL::timeoutOccurred()
-{
-  bool tmp = did_timeout;
-  did_timeout = false;
-  return tmp;
-}
-
-void LIS3MDL::setTimeout(uint16_t timeout)
-{
-  io_timeout = timeout;
-}
-
-uint16_t LIS3MDL::getTimeout()
-{
-  return io_timeout;
-}
 
 bool LIS3MDL::init(deviceType device, sa1State sa1)
 {
