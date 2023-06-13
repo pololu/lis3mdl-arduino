@@ -1,7 +1,5 @@
 # LIS3MDL library for Arduino
 
-Version: 1.0.0<br>
-Release date: 2016 January 19<br>
 [www.pololu.com](https://www.pololu.com/)
 
 ## Summary
@@ -107,4 +105,5 @@ Several example sketches are available that show how to use the library. You can
 
 ## Version history
 
-* 1.0.0 (2016 Jan 19): Original release.
+* 2.0.0 (2023-06-13): Removed timeout functionality that did not work as intended. Changed `enableDefault()` to enable BDU. Added HeadingWithLSM6 example.
+* 1.0.0 (2016-01-19): Original release.
