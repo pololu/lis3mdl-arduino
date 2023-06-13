@@ -112,6 +112,10 @@ void LIS3MDL::enableDefault(void)
     // 0x0C = 0b00001100
     // OMZ = 11 (ultra-high-performance mode for Z)
     writeReg(CTRL_REG4, 0x0C);
+
+    // 0x40 = 0b01000000
+    // BDU = 1 (block data update)
+    writeReg(CTRL_REG5, 0x40);
   }
 }
 
