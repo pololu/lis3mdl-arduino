@@ -4,7 +4,13 @@
 
 ## Summary
 
-This is a library for the Arduino IDE that helps interface with ST's [LIS3MDL 3-axis magnetometer](https://www.pololu.com/product/2737). The library makes it simple to configure the LIS3MDL and read the raw magnetometer data through I&sup2;C.
+This is a library for the Arduino IDE that helps interface with ST's LIS3MDL 3-axis magnetometer via I&sup2;C.  It makes it simple to configure the LIS3MDL and read the raw magnetometer data from these boards:
+
+* [LIS3MDL 3-axis magnetometer carrier](https://www.pololu.com/product/2737)
+* [MinIMU-9 v6 (LSM6DSO and LIS3MDL carrier)](https://www.pololu.com/product/2862)
+* [AltIMU-10 v6 (LSM6DSO, LIS3MDL, and LPS22DF Carrier)](https://www.pololu.com/product/2863)
+* [MinIMU-9 v5 (LSM6DS33 and LIS3MDL carrier)](https://www.pololu.com/product/2738)
+* [AltIMU-9 v5 (LSM6DS33, LIS3MDL, and LPS25H carrier)](https://www.pololu.com/product/2739)
 
 ## Supported platforms
 
@@ -14,7 +20,7 @@ This library is designed to work with the Arduino IDE versions 1.6.x or later; w
 
 ### Hardware
 
-An [LIS3MDL carrier](https://www.pololu.com/product/2737) can be purchased from Pololu's website.  Before continuing, careful reading of the [product page](https://www.pololu.com/product/2737) as well as the LIS3MDL datasheet and application note is recommended.
+An LIS3MDL carrier can be purchased from Pololu's website.  Before continuing, careful reading of the product page as well as the LIS3MDL datasheet and application note is recommended.
 
 Make the following connections between the Arduino and the LIS3MDL board:
 
